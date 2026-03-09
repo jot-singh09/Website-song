@@ -1,0 +1,6 @@
+"Sidhu Moose Wala": ["The Ultimate Sidhu.mp3","295.mp3","8 Cylinder.mp3","008.mp3","Aroma.mp3","Attach.mp3","Bad song.mp3","BAMBIHA BOLE.mp3","Dark Love.mp3","Fk Em All.mp3","G Shit.mp3","Hathyar.mp3","I'm Better Now.mp3","LEGEND.mp3","LEVELS.mp3","LOCK.mp3","Mafia Style.mp3","NEAL.mp3","Panjab.mp3","Papi.mp3","Poison.mp3","Power.mp3","Racks And Rounds.mp3","SANJU.mp3","SATISFY.mp3","Sin.mp3","So High.mp3","Stefflon Don.mp3","STRAIGHT OUTTA.mp3","SYL.mp3","TAKE NOTES.mp3","These Days.mp3","Tochan.mp3","Todh Tere Yaar Da.mp3","UNFUCKWITHABLE.mp3","US.mp3","Vaar.mp3"],
+                "Prem Dhillon": ["Prem Mix Playist.mp3","2 NUMBER.mp3", "26 Boulevard.mp3", "BADBERRY.mp3","BADBOY.mp3","Bootcut.mp3","Can't be us.mp3","DAMN DADDY.mp3","GET AT ME.mp3","SIT DOWN.mp3","TYPE SHII.mp3"],
+                "Jaggix": ["Anthem.mp3","Ask Them.mp3","Even Flow.mp3","Fave value.mp3","Jxggi Dirty.mp3","Look Out.mp3","My Way.mp3","Never Ever.mp3","No Chance.mp3","Presidential.mp3","Reality Check.mp3","Strings Attached.mp3","That's All I Know.mp3","TNT.mp3","Uddna Sapp.mp3","Why me.mp3"],
+                
+                
+                "Subh": ["Shubh.mp3","King Shit.mp3","Still Rollin.mp3"]

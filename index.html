@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎵 My Music Library - Auto Detect</title>
+    <title>🎵 My Music Library - Instant Controls</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -25,6 +25,7 @@
             --border: #2d343c;
             --gradient: linear-gradient(135deg, #8b5cf6, #ec4899);
             --queue-bg: #1e1a2a;
+            --modal-overlay: rgba(0, 0, 0, 0.8);
         }
 
         body {
@@ -32,31 +33,15 @@
             color: var(--text);
             min-height: 100vh;
             transition: padding-bottom 0.3s ease;
-        }
-
-        /* Different padding states */
-        body.no-player {
             padding-bottom: 0;
         }
 
         body.with-player-full {
-            padding-bottom: 240px;
+            padding-bottom: 320px;
         }
 
         body.with-player-compact {
             padding-bottom: 100px;
-        }
-
-        body.with-queue {
-            padding-bottom: 350px;
-        }
-
-        body.with-player-full.with-queue {
-            padding-bottom: 490px;
-        }
-
-        body.with-player-compact.with-queue {
-            padding-bottom: 350px;
         }
 
         .container {
@@ -432,77 +417,166 @@
             font-size: 14px;
         }
 
-        /* Queue Panel */
-        .queue-panel {
+        /* Queue Modal - Centered Window */
+        .queue-modal {
+            display: none;
             position: fixed;
-            bottom: -350px;
+            top: 0;
             left: 0;
             right: 0;
-            background: var(--queue-bg);
-            border-top: 2px solid var(--primary);
-            padding: 16px 20px;
-            max-width: 480px;
-            margin: 0 auto;
-            border-radius: 30px 30px 0 0;
-            transition: bottom 0.3s ease;
-            z-index: 800;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-            max-height: 350px;
-            display: flex;
-            flex-direction: column;
+            bottom: 0;
+            background: var(--modal-overlay);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
-        .queue-panel.open {
-            bottom: 0;
+        .queue-modal.open {
+            display: flex;
+        }
+
+        .queue-window {
+            background: var(--queue-bg);
+            border: 2px solid var(--primary);
+            border-radius: 40px;
+            width: 100%;
+            max-width: 440px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: modalPop 0.3s ease;
+        }
+
+        @keyframes modalPop {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .queue-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .queue-header h3 {
-            font-size: 16px;
+            font-size: 24px;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .queue-header h3 i {
-            color: var(--primary);
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .queue-header .queue-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .queue-header .queue-status span {
-            background: var(--primary);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .queue-header button {
+        .queue-close {
             background: var(--surface-light);
             border: 1px solid var(--border);
             color: var(--text);
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
         }
 
-        .queue-header button:hover {
+        .queue-close:hover {
             background: var(--primary);
             border-color: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        /* Queue Controls - TOP of window */
+        .queue-controls-top {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .queue-controls-top button {
+            flex: 1;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .queue-controls-top button:hover:not(:disabled) {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .queue-controls-top button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .queue-controls-top button.primary {
+            background: var(--gradient);
+            color: white;
+            border: none;
+        }
+
+        .queue-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 8px;
+        }
+
+        .queue-stats .count {
+            background: var(--surface-light);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .queue-stats .count span {
+            color: var(--primary);
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .queue-stats .status {
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .queue-list {
@@ -511,18 +585,24 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding-right: 4px;
+            padding-right: 8px;
+            max-height: 350px;
         }
 
         .queue-item {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 8px 12px;
+            border-radius: 16px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             transition: all 0.2s;
+        }
+
+        .queue-item:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
         }
 
         .queue-item.playing {
@@ -532,9 +612,15 @@
 
         .queue-item-index {
             color: var(--primary);
-            font-weight: 600;
-            font-size: 12px;
-            min-width: 24px;
+            font-weight: 700;
+            font-size: 14px;
+            min-width: 28px;
+            height: 28px;
+            background: var(--surface-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .queue-item-info {
@@ -542,90 +628,79 @@
         }
 
         .queue-item-name {
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 2px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text);
         }
 
         .queue-item-artist {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .queue-item-artist i {
+            font-size: 4px;
+            color: var(--primary);
         }
 
         .queue-item-remove {
             color: var(--text-secondary);
             cursor: pointer;
-            width: 28px;
-            height: 28px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
             transition: all 0.2s;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
         }
 
         .queue-item-remove:hover {
-            background: var(--surface-light);
-            color: #ff6b6b;
+            background: #ff4444;
+            color: white;
+            border-color: #ff4444;
+            transform: scale(1.1);
         }
 
         .queue-empty {
             text-align: center;
             color: var(--text-secondary);
-            padding: 20px;
-            font-size: 13px;
+            padding: 60px 20px;
+            font-size: 15px;
+            background: var(--surface);
+            border-radius: 30px;
+            border: 1px dashed var(--border);
         }
 
-        .queue-controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
+        .queue-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--primary);
+            opacity: 0.5;
         }
 
-        .queue-controls button {
-            flex: 1;
-            background: var(--surface-light);
-            border: 1px solid var(--border);
+        .queue-empty p:first-of-type {
             color: var(--text);
-            padding: 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .queue-controls button:hover:not(:disabled) {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .queue-controls button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .queue-controls button.primary {
-            background: var(--gradient);
-            color: white;
-            border: none;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
 
         /* Music Player - Full Mode */
         .player {
             position: fixed;
-            bottom: -300px;
+            bottom: -350px;
             left: 0;
             right: 0;
             background: var(--surface);
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--border);
-            padding: 16px 20px;
+            padding: 20px 20px;
             max-width: 480px;
             margin: 0 auto;
             border-radius: 30px 30px 0 0;
@@ -749,23 +824,24 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .player-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
             background: var(--gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
             color: white;
         }
 
         .player-info h4 {
-            font-size: 15px;
+            font-size: 16px;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
@@ -774,40 +850,130 @@
             font-size: 13px;
         }
 
+        /* Enhanced Progress Bar with Draggable Handle */
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
         .progress {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 4px;
-            background: var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--gradient);
-            width: 0%;
-            transition: width 0.1s;
+            margin-bottom: 8px;
         }
 
         .time {
             color: var(--text-secondary);
             font-size: 12px;
-            min-width: 40px;
+            min-width: 45px;
+            font-weight: 500;
         }
 
+        .progress-bar-wrapper {
+            position: relative;
+            flex: 1;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: visible;
+            position: relative;
+            pointer-events: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 10px;
+            width: 0%;
+            position: relative;
+            pointer-events: none;
+        }
+
+        .progress-handle {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 0%;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.6);
+            cursor: grab;
+            transition: transform 0.05s, box-shadow 0.05s;
+            z-index: 30;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .progress-handle:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 6px 15px rgba(139, 92, 246, 0.8);
+        }
+
+        .progress-handle.dragging {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 6px 15px rgba(139, 92, 246, 0.8);
+        }
+
+        .time-tooltip {
+            position: absolute;
+            top: -35px;
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            transform: translateX(-50%);
+            display: none;
+            pointer-events: none;
+            z-index: 40;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .progress-bar-wrapper:hover .time-tooltip {
+            display: block;
+        }
+
+        .time-tooltip.show {
+            display: block;
+        }
+
+        /* Clickable overlay for the progress bar */
+        .progress-click-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 20;
+            cursor: pointer;
+        }
+
+        /* Player Controls */
         .player-controls {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .player-controls button {
@@ -822,51 +988,74 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.1s;
+        }
+
+        .player-controls button:hover {
+            background: var(--surface-light);
+            transform: scale(1.1);
         }
 
         .player-controls button:active {
-            background: var(--surface-light);
+            transform: scale(0.95);
         }
 
         .play-btn {
             background: var(--gradient) !important;
-            width: 56px !important;
-            height: 56px !important;
-            font-size: 24px !important;
-            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            width: 64px !important;
+            height: 64px !important;
+            font-size: 28px !important;
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.4);
         }
 
-        .play-btn:active {
-            transform: scale(0.95);
+        .play-btn:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.6) !important;
         }
 
-        /* Loop Controls */
-        .loop-controls {
+        /* Jump buttons */
+        .jump-btn {
+            background: var(--surface-light) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            font-size: 16px !important;
+            width: 40px !important;
+            height: 40px !important;
+        }
+
+        .jump-btn:hover {
+            background: var(--primary) !important;
+            border-color: var(--primary) !important;
+            color: white !important;
+        }
+
+        /* Loop Controls Row */
+        .loop-controls-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            background: var(--surface-light);
+            border-radius: 40px;
+            border: 1px solid var(--border);
         }
 
-        .loop-left {
+        .loop-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
         .loop-btn {
-            background: var(--surface-light);
+            background: var(--surface);
             border: 1px solid var(--border);
             color: var(--text-secondary);
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -878,30 +1067,53 @@
             border: none;
         }
 
-        .loop-btn:active {
-            transform: scale(0.95);
+        .loop-btn:hover {
+            border-color: var(--primary);
+            transform: scale(1.1);
         }
 
         .loop-text {
             color: var(--text-secondary);
-            font-size: 13px;
-            background: var(--surface-light);
-            padding: 6px 12px;
-            border-radius: 20px;
+            font-size: 14px;
+            background: var(--surface);
+            padding: 8px 16px;
+            border-radius: 30px;
             border: 1px solid var(--border);
         }
 
         .loop-text span {
             color: var(--primary);
             font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .volume-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.05s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .volume-btn:active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(0.95);
         }
 
         .hide-btn {
             background: var(--surface-light);
             border: 1px solid var(--border);
             color: var(--text-secondary);
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.2s;
@@ -925,7 +1137,8 @@
     <div class="container">
         <div class="header">
             <h1>My Music Library</h1>
-            <p>🎵 Auto-detects your folders & songs</p>
+            <p>🎵 MADE BY KARAN</p>
+            <p>The code is on git <a href="https://github.com/jot-singh09">Link</a> </p>
         </div>
 
         <!-- Search Bar -->
@@ -952,19 +1165,19 @@
 
         <!-- Control Buttons -->
         <div class="controls">
-            <button class="control-btn primary" onclick="playRemix()" id="remixBtn" disabled>
+            <button class="control-btn primary" onclick="shuffleAllSongs()" id="shuffleBtn" disabled>
                 <i class="fas fa-random"></i>
-                Remix All
+                Shuffle All
             </button>
-            <button class="control-btn" onclick="toggleQueue()" id="queueToggleBtn">
+            <button class="control-btn" onclick="openQueueModal()" id="queueToggleBtn">
                 <i class="fas fa-list"></i>
                 Queue (<span id="queueCount">0</span>)
             </button>
         </div>
 
-        <!-- Artists Section -->
+        <!-- Artists Grid -->
         <div class="section-title">
-            <h2><i class="fas fa-users"></i> Your Artists</h2>
+            <h2><i class="fas fa-users"></i> Artists</h2>
             <span id="artistTotal">0 artists</span>
         </div>
         <div class="artists-grid" id="artistsGrid"></div>
@@ -986,34 +1199,44 @@
         <div id="songsContainer"></div>
     </div>
 
-    <!-- Queue Panel -->
-    <div class="queue-panel" id="queuePanel">
-        <div class="queue-header">
-            <h3><i class="fas fa-list"></i> Play Queue</h3>
-            <div class="queue-status">
-                <span id="queueStatus"></span>
-                <button onclick="toggleQueue()"><i class="fas fa-chevron-down"></i></button>
+    <!-- Queue Modal - Centered Window -->
+    <div class="queue-modal" id="queueModal">
+        <div class="queue-window">
+            <div class="queue-header">
+                <h3><i class="fas fa-list"></i> Play Queue</h3>
+                <button class="queue-close" onclick="closeQueueModal()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </div>
-        
-        <div class="queue-list" id="queueList">
-            <div class="queue-empty">
-                <i class="fas fa-music"></i>
-                <p>Queue is empty</p>
-                <p style="font-size: 11px; margin-top: 8px;">Click + on songs to add them</p>
+            
+            <!-- Queue Controls - TOP of window -->
+            <div class="queue-controls-top">
+                <button onclick="playQueue()" id="playQueueBtn" disabled>
+                    <i class="fas fa-play"></i> Play
+                </button>
+                <button onclick="addCurrentToQueue()" id="addCurrentBtn" disabled>
+                    <i class="fas fa-plus"></i> Current
+                </button>
+                <button class="primary" onclick="clearQueue()" id="clearQueueBtn" disabled>
+                    <i class="fas fa-trash"></i> Clear
+                </button>
             </div>
-        </div>
 
-        <div class="queue-controls">
-            <button onclick="playQueue()" id="playQueueBtn" disabled>
-                <i class="fas fa-play"></i> Play Queue
-            </button>
-            <button onclick="addCurrentToQueue()" id="addCurrentBtn" disabled>
-                <i class="fas fa-plus"></i> Add Current
-            </button>
-            <button onclick="clearQueue()" id="clearQueueBtn" disabled>
-                <i class="fas fa-trash"></i> Clear
-            </button>
+            <!-- Queue Stats -->
+            <div class="queue-stats">
+                <div class="count">
+                    <span id="queueCountModal">0</span> songs
+                </div>
+                <div class="status" id="queueStatusModal"></div>
+            </div>
+
+            <div class="queue-list" id="queueList">
+                <div class="queue-empty">
+                    <i class="fas fa-music"></i>
+                    <p>Your queue is empty</p>
+                    <p>Click the + button on any song to add it</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1029,34 +1252,57 @@
             </div>
         </div>
         
-        <div class="progress">
-            <span class="time" id="currentTime">0:00</span>
-            <div class="progress-bar" onclick="seek(event)">
-                <div class="progress-fill" id="progressFill"></div>
+        <!-- Enhanced Progress Bar with Draggable Handle -->
+        <div class="progress-container">
+            <div class="progress">
+                <span class="time" id="currentTime">0:00</span>
+                <div class="progress-bar-wrapper" id="progressBarWrapper">
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-handle" id="progressHandle" 
+                         onmousedown="startDragging(event)"
+                         style="left: 0%;"></div>
+                    <div class="progress-click-overlay" onclick="handleProgressBarClick(event)"></div>
+                    <div class="time-tooltip" id="timeTooltip">0:00</div>
+                </div>
+                <span class="time" id="totalTime">0:00</span>
             </div>
-            <span class="time" id="totalTime">0:00</span>
         </div>
 
+        <!-- Player Controls with 10s Skip Buttons -->
         <div class="player-controls">
+            <button class="jump-btn" onclick="jumpBackward()" title="Jump back 10 seconds">
+                <i class="fas fa-rotate-left"></i> 10
+            </button>
             <button onclick="playPrevious()"><i class="fas fa-backward-step"></i></button>
             <button class="play-btn" onclick="togglePlay()">
                 <i class="fas fa-play" id="playIcon"></i>
             </button>
             <button onclick="playNext()"><i class="fas fa-forward-step"></i></button>
+            <button class="jump-btn" onclick="jumpForward()" title="Jump forward 10 seconds">
+                <i class="fas fa-rotate-right"></i> 10
+            </button>
         </div>
 
-        <div class="loop-controls">
-            <div class="loop-left">
+        <!-- Loop Controls in a Single Row -->
+        <div class="loop-controls-row">
+            <div class="loop-group">
                 <button class="loop-btn" onclick="cycleLoopMode()" id="loopBtn" title="Change loop mode">
                     <i class="fas fa-repeat" id="loopIcon"></i>
                 </button>
-                <div class="loop-text" id="loopText">
-                    <span id="loopModeText">None</span>
+                <div class="loop-text">
+                    Loop: <span id="loopModeText">None</span>
                 </div>
             </div>
-            <button class="hide-btn" onclick="togglePlayerMode()" id="hideFullBtn" title="Switch to compact mode">
-                <i class="fas fa-chevron-down"></i>
-            </button>
+            <div style="display: flex; gap: 8px;">
+                <button class="volume-btn" onclick="toggleMute()" id="muteBtn" title="Toggle mute">
+                    <i class="fas fa-volume-high" id="volumeIcon"></i>
+                </button>
+                <button class="hide-btn" onclick="togglePlayerMode()" id="hideFullBtn" title="Switch to compact mode">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1083,50 +1329,26 @@
         </div>
     </div>
 
-    <!-- Multi-Select Modal -->
-    <div style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; justify-content: center; align-items: flex-end;" id="artistModal" onclick="closeArtistModal()">
-        <div style="background: var(--surface); width: 100%; max-width: 480px; border-radius: 40px 40px 0 0; padding: 24px; animation: slideUp 0.3s;" onclick="event.stopPropagation()">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 20px;">Select Artists (min 2)</h3>
-                <button style="background: var(--surface-light); border: none; color: var(--text); width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" onclick="closeArtistModal()">✕</button>
-            </div>
-            
-            <div style="background: var(--surface-light); padding: 16px; border-radius: 16px; margin: 16px 0; display: flex; justify-content: space-between;">
-                <span>Selected: <span id="modalSelectedCount">0</span></span>
-                <span>Min: 2</span>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-height: 400px; overflow-y: auto; padding: 4px;" id="artistSelectGrid"></div>
-
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button style="flex: 1; padding: 16px; border: 1px solid var(--border); border-radius: 40px; background: var(--surface-light); color: var(--text); cursor: pointer;" onclick="closeArtistModal()">Cancel</button>
-                <button style="flex: 1; padding: 16px; border: none; border-radius: 40px; background: var(--gradient); color: white; cursor: pointer;" onclick="shuffleSelectedArtists()" id="modalShuffleBtn">Shuffle</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // =============================================
-        // MUSIC PLAYER WITH QUEUE FUNCTIONALITY
+        // MUSIC PLAYER WITH INSTANT MUTE & DRAGGABLE HANDLE
         // =============================================
         
-        function getRealFolders() {
-            const demoFolders = {
-                "Sidhu Moose Wala": ["295.mp3","8 Cylinder.mp3","008.mp3","Aroma.mp3","Attach.mp3","Bad song.mp3","BAMBIHA BOLE.mp3","Dark Love.mp3","Fk Em All.mp3","G Shit.mp3","Hathyar.mp3","I'm Better Now.mp3","LEGEND.mp3","LEVELS.mp3","LOCK.mp3","Mafia Style.mp3","NEAL.mp3","Panjab.mp3","Papi.mp3","Poison.mp3","Power.mp3","Racks And Rounds.mp3","SANJU.mp3","SATISFY.mp3","Sin.mp3","So High.mp3","Stefflon Don.mp3","STRAIGHT OUTTA.mp3","SYL.mp3","TAKE NOTES.mp3","These Days.mp3","Tochan.mp3","Todh Tere Yaar Da.mp3","UNFUCKWITHABLE.mp3","US.mp3","Vaar.mp3"],
-                // "AP Dhillon": ["Brown Munde.mp3", "Excuses.mp3", "Ma Belle.mp3", "Insane.mp3"],
-                // "Diljit Dosanjh": ["G.O.A.T.mp3", "Lover.mp3", "Born to Shine.mp3"],
-                // "Karan Aujla": ["Don't Look.mp3", "Feelings.mp3", "Admirin' You.mp3"],
-                // "Prem Dhillon": ["Old Skool.mp3", "Majhail.mp3", "Promise.mp3"]
+        // Demo music data with folders
+        function getMusicData() {
+            return {
+                "Sidhu Moose Wala": ["The Ultimate Sidhu.mp3","295.mp3","8 Cylinder.mp3","008.mp3","Aroma.mp3","Attach.mp3","Bad song.mp3","BAMBIHA BOLE.mp3","Dark Love.mp3","Fk Em All.mp3","G Shit.mp3","Hathyar.mp3","I'm Better Now.mp3","LEGEND.mp3","LEVELS.mp3","LOCK.mp3","Mafia Style.mp3","NEAL.mp3","Panjab.mp3","Papi.mp3","Poison.mp3","Power.mp3","Racks And Rounds.mp3","SANJU.mp3","SATISFY.mp3","Sin.mp3","So High.mp3","Stefflon Don.mp3","STRAIGHT OUTTA.mp3","SYL.mp3","TAKE NOTES.mp3","These Days.mp3","Tochan.mp3","Todh Tere Yaar Da.mp3","UNFUCKWITHABLE.mp3","US.mp3","Vaar.mp3"],
+                "Prem Dhillon": ["Prem Mix Playist.mp3","2 NUMBER.mp3", "26 Boulevard.mp3", "BADBERRY.mp3","BADBOY.mp3","Bootcut.mp3","Can't be us.mp3","DAMN DADDY.mp3","GET AT ME.mp3","SIT DOWN.mp3","TYPE SHII.mp3"],
+                "Jaggix": ["Anthem.mp3","Ask Them.mp3","Even Flow.mp3","Fave value.mp3","Jxggi Dirty.mp3","Look Out.mp3","My Way.mp3","Never Ever.mp3","No Chance.mp3","Presidential.mp3","Reality Check.mp3","Strings Attached.mp3","That's All I Know.mp3","TNT.mp3","Uddna Sapp.mp3","Why me.mp3"],
+                "Subh": ["Shubh.mp3","King Shit.mp3","Still Rollin.mp3"]
             };
-            
-            return demoFolders;
         }
 
-        const musicData = getRealFolders();
+        const musicData = getMusicData();
         let artists = [];
         let songs = [];
 
-        // Process folders
+        // Process folders into artists and songs
         Object.keys(musicData).forEach((artistName, index) => {
             const songFiles = musicData[artistName];
             
@@ -1137,10 +1359,10 @@
                     id: index + 1
                 });
                 
-                songFiles.forEach((file, songIndex) => {
+                songFiles.forEach((file) => {
                     songs.push({
                         id: songs.length + 1,
-                        name: file.replace('.mp3', '').replace('.MP3', '').replace('.m4a', ''),
+                        name: file.replace('.mp3', '').replace('.MP3', ''),
                         artist: artistName,
                         url: `./${artistName}/${file}`,
                         file: file
@@ -1155,7 +1377,6 @@
         let isPlaying = false;
         let currentArtist = null;
         let audio = new Audio();
-        let selectedArtists = [];
         let searchTerm = '';
         let searchTimeout;
         
@@ -1169,6 +1390,14 @@
         
         // Loop state
         let loopMode = 'none';
+        
+        // Volume/Mute state - INSTANT response
+        let isMuted = false;
+        let previousVolume = 0.7; // Default volume
+        audio.volume = previousVolume;
+        
+        // Seek/Drag state
+        let isDragging = false;
         
         const loopModes = [
             { mode: 'none', icon: 'fa-times', display: 'None' },
@@ -1185,19 +1414,15 @@
             updateLoopDisplay();
             updateQueueUI();
             updateBodyPadding();
+            updateVolumeIcon(); // Set initial volume icon
             
-            document.getElementById('remixBtn').disabled = songs.length === 0;
+            document.getElementById('shuffleBtn').disabled = songs.length === 0;
         });
 
         function updateBodyPadding() {
             const body = document.body;
-            const queueOpen = document.getElementById('queuePanel').classList.contains('open');
             
-            body.classList.remove('no-player', 'with-player-full', 'with-player-compact', 'with-queue');
-            
-            if (queueOpen) {
-                body.classList.add('with-queue');
-            }
+            body.classList.remove('no-player', 'with-player-full', 'with-player-compact');
             
             if (playerMode === 'full') {
                 body.classList.add('with-player-full');
@@ -1282,7 +1507,17 @@
             }
         }
 
-        // Queue Functions
+        // ========== QUEUE MODAL FUNCTIONS ==========
+        function openQueueModal() {
+            document.getElementById('queueModal').classList.add('open');
+            updateQueueUI();
+        }
+
+        function closeQueueModal() {
+            document.getElementById('queueModal').classList.remove('open');
+        }
+
+        // ========== QUEUE FUNCTIONS ==========
         function addToQueue(songId) {
             const song = songs.find(s => s.id === songId);
             if (song) {
@@ -1296,7 +1531,7 @@
                     setTimeout(() => {
                         btn.classList.remove('added');
                         btn.innerHTML = '<i class="fas fa-plus"></i>';
-                    }, 1000);
+                    }, 500);
                 }
             }
         }
@@ -1311,7 +1546,6 @@
 
         function removeFromQueue(index) {
             if (isPlayingFromQueue && index === queueIndex) {
-                // If removing currently playing song from queue
                 if (queue.length > 1) {
                     if (index === 0) {
                         queueIndex = 0;
@@ -1343,7 +1577,7 @@
             isPlayingFromQueue = true;
             queueIndex = 0;
             currentPlaylist = queue;
-            playSong(0);
+            playSong(queueIndex);
             updateQueueUI();
         }
 
@@ -1355,7 +1589,6 @@
                 playSong(queueIndex);
                 return true;
             } else {
-                // End of queue
                 if (loopMode === 'all') {
                     queueIndex = 0;
                     playSong(0);
@@ -1363,6 +1596,7 @@
                 } else {
                     isPlayingFromQueue = false;
                     queueIndex = -1;
+                    currentPlaylist = songs;
                     return false;
                 }
             }
@@ -1371,31 +1605,37 @@
         function updateQueueUI() {
             const queueList = document.getElementById('queueList');
             const queueCount = document.getElementById('queueCount');
+            const queueCountModal = document.getElementById('queueCountModal');
             const playQueueBtn = document.getElementById('playQueueBtn');
             const addCurrentBtn = document.getElementById('addCurrentBtn');
             const clearQueueBtn = document.getElementById('clearQueueBtn');
-            const queueStatus = document.getElementById('queueStatus');
+            const queueStatusModal = document.getElementById('queueStatusModal');
             
             queueCount.textContent = queue.length;
+            queueCountModal.textContent = queue.length;
             
             if (queue.length === 0) {
                 queueList.innerHTML = `
                     <div class="queue-empty">
                         <i class="fas fa-music"></i>
-                        <p>Queue is empty</p>
-                        <p style="font-size: 11px; margin-top: 8px;">Click + on songs to add them</p>
+                        <p>Your queue is empty</p>
+                        <p>Click the + button on any song to add it</p>
                     </div>
                 `;
                 playQueueBtn.disabled = true;
                 clearQueueBtn.disabled = true;
-                queueStatus.textContent = '';
+                queueStatusModal.textContent = '';
             } else {
                 queueList.innerHTML = queue.map((song, index) => `
                     <div class="queue-item ${isPlayingFromQueue && index === queueIndex ? 'playing' : ''}">
                         <div class="queue-item-index">${index + 1}</div>
                         <div class="queue-item-info">
                             <div class="queue-item-name">${song.name}</div>
-                            <div class="queue-item-artist">${song.artist}</div>
+                            <div class="queue-item-artist">
+                                ${song.artist}
+                                <i class="fas fa-circle"></i>
+                                ${song.file}
+                            </div>
                         </div>
                         <div class="queue-item-remove" onclick="removeFromQueue(${index})">
                             <i class="fas fa-times"></i>
@@ -1404,55 +1644,38 @@
                 `).join('');
                 playQueueBtn.disabled = false;
                 playQueueBtn.innerHTML = isPlayingFromQueue ? 
-                    '<i class="fas fa-play"></i> Resume Queue' : 
-                    '<i class="fas fa-play"></i> Play Queue';
+                    '<i class="fas fa-play"></i> Resume' : 
+                    '<i class="fas fa-play"></i> Play';
                 clearQueueBtn.disabled = false;
-                queueStatus.textContent = `${queue.length} songs`;
+                queueStatusModal.innerHTML = isPlayingFromQueue ? 
+                    '<i class="fas fa-play-circle"></i> Playing from queue' : 
+                    '<i class="fas fa-pause-circle"></i> Queue ready';
             }
             
             addCurrentBtn.disabled = currentIndex === -1;
         }
 
-        function toggleQueue() {
-            const panel = document.getElementById('queuePanel');
-            panel.classList.toggle('open');
-            updateBodyPadding();
-        }
-
-        // Audio Functions
+        // ========== AUDIO FUNCTIONS ==========
         function setupAudioListeners() {
             audio.addEventListener('timeupdate', updateProgress);
             audio.addEventListener('ended', handleSongEnd);
             audio.addEventListener('loadedmetadata', () => {
                 document.getElementById('totalTime').textContent = formatTime(audio.duration);
+                updateProgress();
             });
-            audio.addEventListener('error', (e) => {
-                console.error('Audio error:', e);
-                alert('❌ Cannot play: ' + currentPlaylist[currentIndex]?.file);
-            });
+            audio.addEventListener('volumechange', updateVolumeIcon);
         }
 
         function handleSongEnd() {
             if (isPlayingFromQueue) {
-                // Play next in queue
                 const playedNext = playNextFromQueue();
                 if (!playedNext) {
-                    // Queue ended, go back to normal playlist
                     isPlayingFromQueue = false;
                     queueIndex = -1;
                     currentPlaylist = songs;
-                    
-                    if (loopMode === 'all') {
-                        playSong(0);
-                    } else {
-                        isPlaying = false;
-                        document.getElementById('playIcon').className = 'fas fa-play';
-                        document.getElementById('compactPlayIcon').className = 'fas fa-play';
-                    }
                 }
                 updateQueueUI();
             } else {
-                // Normal playlist behavior
                 switch(loopMode) {
                     case 'one':
                         playSong(currentIndex);
@@ -1573,7 +1796,46 @@
             }
         }
 
-        function playRemix() {
+        // ========== 10 SECOND JUMP FUNCTIONS ==========
+        function jumpForward() {
+            if (currentIndex === -1) return;
+            audio.currentTime = Math.min(audio.currentTime + 10, audio.duration);
+        }
+
+        function jumpBackward() {
+            if (currentIndex === -1) return;
+            audio.currentTime = Math.max(audio.currentTime - 10, 0);
+        }
+
+        // ========== INSTANT MUTE FUNCTION ==========
+        function toggleMute() {
+            // Toggle mute state instantly
+            isMuted = !isMuted;
+            
+            if (isMuted) {
+                previousVolume = audio.volume; // Store current volume
+                audio.volume = 0; // Instant mute
+            } else {
+                audio.volume = previousVolume || 0.7; // Restore volume instantly
+            }
+            
+            // Update icon immediately
+            updateVolumeIcon();
+        }
+
+        function updateVolumeIcon() {
+            const icon = document.getElementById('volumeIcon');
+            // Update icon based on current volume state
+            if (audio.volume === 0 || isMuted) {
+                icon.className = 'fas fa-volume-mute';
+            } else if (audio.volume < 0.5) {
+                icon.className = 'fas fa-volume-low';
+            } else {
+                icon.className = 'fas fa-volume-high';
+            }
+        }
+
+        function shuffleAllSongs() {
             if (songs.length === 0) return;
             const randomIndex = Math.floor(Math.random() * songs.length);
             currentPlaylist = songs;
@@ -1583,12 +1845,90 @@
             goBack();
         }
 
+        // ========== DRAGGABLE PROGRESS BAR ==========
         function updateProgress() {
-            if (!isNaN(audio.duration)) {
+            if (!isNaN(audio.duration) && !isDragging) {
                 const progress = (audio.currentTime / audio.duration) * 100;
                 document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('progressHandle').style.left = progress + '%';
                 document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
             }
+        }
+
+        function startDragging(e) {
+            e.preventDefault();
+            if (currentIndex === -1) return;
+            
+            isDragging = true;
+            document.getElementById('progressHandle').classList.add('dragging');
+            
+            // Update tooltip position
+            updateTooltipPosition(e);
+            
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', stopDragging);
+        }
+
+        function onDrag(e) {
+            if (!isDragging || currentIndex === -1) return;
+            e.preventDefault();
+            
+            const wrapper = document.getElementById('progressBarWrapper');
+            const rect = wrapper.getBoundingClientRect();
+            let percent = (e.clientX - rect.left) / rect.width;
+            percent = Math.max(0, Math.min(1, percent));
+            
+            // Update UI during drag
+            document.getElementById('progressFill').style.width = (percent * 100) + '%';
+            document.getElementById('progressHandle').style.left = (percent * 100) + '%';
+            
+            // Update tooltip
+            updateTooltipPosition(e);
+        }
+
+        function updateTooltipPosition(e) {
+            const wrapper = document.getElementById('progressBarWrapper');
+            const rect = wrapper.getBoundingClientRect();
+            let percent = (e.clientX - rect.left) / rect.width;
+            percent = Math.max(0, Math.min(1, percent));
+            
+            if (!isNaN(audio.duration)) {
+                const seekTime = percent * audio.duration;
+                document.getElementById('timeTooltip').textContent = formatTime(seekTime);
+                document.getElementById('timeTooltip').style.left = (percent * 100) + '%';
+                document.getElementById('timeTooltip').classList.add('show');
+            }
+        }
+
+        function stopDragging(e) {
+            if (isDragging && currentIndex !== -1) {
+                const wrapper = document.getElementById('progressBarWrapper');
+                const rect = wrapper.getBoundingClientRect();
+                let percent = (e.clientX - rect.left) / rect.width;
+                percent = Math.max(0, Math.min(1, percent));
+                
+                // Set audio position
+                audio.currentTime = percent * audio.duration;
+                
+                isDragging = false;
+                document.getElementById('progressHandle').classList.remove('dragging');
+                document.getElementById('timeTooltip').classList.remove('show');
+            }
+            
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('mouseup', stopDragging);
+        }
+
+        function handleProgressBarClick(e) {
+            if (currentIndex === -1 || isDragging) return;
+            
+            const wrapper = document.getElementById('progressBarWrapper');
+            const rect = wrapper.getBoundingClientRect();
+            let percent = (e.clientX - rect.left) / rect.width;
+            percent = Math.max(0, Math.min(1, percent));
+            
+            // Jump to clicked position
+            audio.currentTime = percent * audio.duration;
         }
 
         function formatTime(seconds) {
@@ -1598,14 +1938,7 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        function seek(e) {
-            const bar = e.currentTarget;
-            const rect = bar.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
-            audio.currentTime = percent * audio.duration;
-        }
-
-        // UI Functions
+        // ========== UI FUNCTIONS ==========
         function updateUI() {
             document.getElementById('artistCount').textContent = artists.length;
             document.getElementById('songCount').textContent = songs.length;
@@ -1717,59 +2050,12 @@
             currentPlaylist = songsToDisplay;
         }
 
-        // Multi-select functions
-        function openArtistModal() {
-            if (artists.length < 2) return;
-            
-            const grid = document.getElementById('artistSelectGrid');
-            grid.innerHTML = artists.map(artist => `
-                <div style="background: var(--surface-light); border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; border: 2px solid transparent;" 
-                     onclick="toggleArtistSelect('${artist.name}', this)">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gradient); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">
-                        ${artist.name.charAt(0)}
-                    </div>
-                    <div style="font-weight: 600; margin-bottom: 4px;">${artist.name}</div>
-                    <div style="color: var(--text-secondary); font-size: 12px;">${artist.songCount} songs</div>
-                </div>
-            `).join('');
-            
-            document.getElementById('artistModal').style.display = 'flex';
-            selectedArtists = [];
-            document.getElementById('modalSelectedCount').textContent = '0';
-        }
-
-        function toggleArtistSelect(artistName, element) {
-            const index = selectedArtists.indexOf(artistName);
-            if (index === -1) {
-                selectedArtists.push(artistName);
-                element.style.borderColor = 'var(--primary)';
-            } else {
-                selectedArtists.splice(index, 1);
-                element.style.borderColor = 'transparent';
+        // Close modal when clicking outside
+        document.getElementById('queueModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQueueModal();
             }
-            
-            document.getElementById('modalSelectedCount').textContent = selectedArtists.length;
-            document.getElementById('modalShuffleBtn').style.opacity = selectedArtists.length < 2 ? '0.5' : '1';
-        }
-
-        function closeArtistModal() {
-            document.getElementById('artistModal').style.display = 'none';
-        }
-
-        function shuffleSelectedArtists() {
-            if (selectedArtists.length < 2) return;
-            
-            const artistSongs = songs.filter(song => selectedArtists.includes(song.artist));
-            if (artistSongs.length === 0) return;
-            
-            const randomIndex = Math.floor(Math.random() * artistSongs.length);
-            currentPlaylist = artistSongs;
-            isPlayingFromQueue = false;
-            queueIndex = -1;
-            playSong(randomIndex);
-            goBack();
-            closeArtistModal();
-        }
+        });
     </script>
 </body>
 </html>
